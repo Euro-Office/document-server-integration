@@ -1,5 +1,8 @@
 # Change Log
 
+##
+- nodejs: setUsers for c=filler
+
 ## 1.15.0
 - nodejs: added AI Auto Fill Plugin
 - php-laravel: fix custom jwt header
