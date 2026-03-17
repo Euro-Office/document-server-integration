@@ -2,6 +2,7 @@
 
 ##
 - nodejs: setUsers for c=filler
+- nodejs: system start filling panel for default user
 
 ## 1.15.0
 - nodejs: added AI Auto Fill Plugin
