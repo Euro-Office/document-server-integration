@@ -58,7 +58,7 @@ exports.registerRoutes = function registerRoutes(app) {
 
     try {
       // get all the stored files
-      const files = req.DocManager.getStoredFiles();
+      const files = await req.DocManager.getStoredFiles();
 
       // run through all the files and write the corresponding information to each file
       // eslint-disable-next-line no-restricted-syntax
