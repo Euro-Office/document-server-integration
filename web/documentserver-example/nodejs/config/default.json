@@ -21,7 +21,7 @@
     "converterUrl": "converter",
     "apiUrl": "web-apps/apps/api/documents/api.js",
     "preloaderUrl": "web-apps/apps/api/documents/preload.html",
-    "exampleUrl": null,
+    "exampleUrl": "http://localhost/example/",
     "storageFolder": "./files",
     "storagePath": "/files",
     "maxFileSize": 1073741824,
