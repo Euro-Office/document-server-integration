@@ -21,6 +21,7 @@ const tokenValidator = require('./tokenValidator');
 const filesController = require('./filesController');
 const utils = require('./utils');
 const DocManager = require('../docManager');
+const documentService = require('../documentService');
 const fileUtility = require('../fileUtility');
 const users = require('../users');
 
@@ -88,7 +89,7 @@ exports.registerRoutes = function registerRoutes(app) {
         params: req.DocManager.getCustomParams(),
         users,
         preloaderUrl: siteUrl + configServer.get('preloaderUrl'),
-        languages: configServer.get('languages'),
+        languages: (await documentService.config()).langObject,
         enableForgotten: configServer.get('enableForgotten'),
         editNewExts,
       });
