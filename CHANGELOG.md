@@ -1,5 +1,6 @@
 # Change Log
 
+- php-laravel: update docs-integration-sdk to 1.4
 - nodejs: wopi CopyPasteRestrictions for anonymous
 - update insertImage formats
 - new mobile index page view
