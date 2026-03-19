@@ -1,5 +1,6 @@
 # Change Log
 
+- java-spring: docs-integration-sdk updated to 1.8
 - nodejs: wopi CopyPasteRestrictions for anonymous
 - update insertImage formats
 - new mobile index page view
