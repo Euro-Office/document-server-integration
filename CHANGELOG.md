@@ -1,6 +1,7 @@
 # Change Log
 
 - java-spring: docs-integration-sdk updated to 1.8
+- php-laravel: update docs-integration-sdk to 1.4
 - nodejs: wopi CopyPasteRestrictions for anonymous
 - update insertImage formats
 - new mobile index page view
