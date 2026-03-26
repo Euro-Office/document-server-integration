@@ -1,0 +1,56 @@
+# -----------------------------------------------------------------------------
+# Minimal DocumentServer Test Setup
+# -----------------------------------------------------------------------------
+#
+# Prerequisites:
+# Before using this docker-compose setup, you must build the Docker image
+# locally from the main repository:
+#
+#     make build-image
+#
+# This command builds the image:
+#     euro-office/documentserver:latest
+#
+# -----------------------------------------------------------------------------
+# Starting the services
+# -----------------------------------------------------------------------------
+#
+# Start the container in the background:
+#
+#     docker compose up -d
+#
+# You can monitor the container logs with:
+#
+#     docker logs -f eo-documentserver
+#
+# The Document Server is fully started when you see a log message like:
+#
+#     INFO success: docservice entered RUNNING state
+#
+# -----------------------------------------------------------------------------
+# Start the example application
+# -----------------------------------------------------------------------------
+#
+# The example Node.js application is not started automatically.
+# After the container is running, start it manually with:
+#
+#     docker exec -it eo-documentserver supervisorctl start ds-example
+#
+# -----------------------------------------------------------------------------
+# Access the example
+# -----------------------------------------------------------------------------
+#
+# Open the example in your browser:
+#
+#     http://localhost:8080/example/
+#
+# -----------------------------------------------------------------------------
+
+name: minimal-documentserver-test
+
+services:
+  documentserver:
+    image: euro-office/documentserver:latest
+    container_name: eo-documentserver
+    ports:
+      - "8080:80"

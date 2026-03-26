@@ -1,6 +1,9 @@
 {
   "server": {
-    "port": 3000,
-    "siteUrl": "http://127.0.0.1:8000/"
+    "siteUrl": "/",
+    "exampleUrl": "http://localhost/example",
+    "token": {
+      "enable": true
+    }
   }
 }
