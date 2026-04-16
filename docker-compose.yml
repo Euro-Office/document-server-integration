@@ -28,19 +28,11 @@
 #     INFO success: docservice entered RUNNING state
 #
 # -----------------------------------------------------------------------------
-# Start the example application
-# -----------------------------------------------------------------------------
-#
-# The example Node.js application is not started automatically.
-# After the container is running, start it manually with:
-#
-#     docker exec -it eo-documentserver supervisorctl start ds-example
-#
-# -----------------------------------------------------------------------------
 # Access the example
 # -----------------------------------------------------------------------------
 #
-# Open the example in your browser:
+# The example Node.js application starts automatically (EXAMPLE_ENABLED=true).
+# Open the example in your browser once the container is running:
 #
 #     http://localhost:8080/example/
 #
@@ -50,7 +42,10 @@ name: minimal-documentserver-test
 
 services:
   documentserver:
-    image: euro-office/documentserver:latest
+    image: ghcr.io/euro-office/documentserver:latest
+    environment:
+      EXAMPLE_ENABLED: "true"
+      JWT_SECRET: "secret"
     container_name: eo-documentserver
     ports:
       - "8080:80"

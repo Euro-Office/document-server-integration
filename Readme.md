@@ -20,6 +20,62 @@ You should change `http://documentserver` to your server address in these files:
 * [Ruby](https://github.com/Euro-Office/document-server-integration/tree/main/web/documentserver-example/ruby) - `web/documentserver-example/ruby/app/configuration/configuration.rb`
 
 
+## Quick Start — minimal Docker test environment
+
+The repository ships a `docker-compose.yml` that starts a self-contained
+Euro-Office DocumentServer with the Node.js integration example enabled
+automatically. No extra configuration or manual service start is required.
+
+**Prerequisites:** Docker with the Compose plugin (v2).
+
+**1. Start the container:**
+
+```bash
+docker compose up -d
+```
+
+**2. Wait until the server is ready** — monitor the logs:
+
+```bash
+docker logs -f eo-documentserver
+```
+
+The server is ready when you see:
+
+```
+INFO success: docservice entered RUNNING state
+```
+
+**3. Open the example in your browser:**
+
+```
+http://localhost:8080/example/
+```
+
+To open a specific file type directly in the editor:
+
+```
+http://localhost:8080/example/editor?fileExt=docx&userid=uid-1&lang=en&directUrl=false
+```
+
+| Parameter | Description |
+|-----------|-------------|
+| `fileExt` | Extension of the new blank document (`docx`, `xlsx`, `pptx`) |
+| `userid`  | Any user identifier (e.g. `uid-1`) |
+| `lang`    | UI language — exact locale (`en-US`) or two-letter code with `default` fallback (`en`) |
+| `directUrl` | Set `true` to pass the file URL directly to the browser |
+
+**Stop and remove the container:**
+
+```bash
+docker compose down
+```
+
+> **Security note:** The compose file sets `JWT_SECRET=secret`. This is
+> intentionally insecure and is only suitable for local development and
+> testing. Never expose this setup to a public network.
+
+
 ## API methods for test examples
 
 The methods described below are available for all of the test examples.

@@ -139,8 +139,17 @@ DocManager.prototype.createDemo = function createDemo(isSample, fileExt, userid,
   const fileName = this.getCorrectName(demoName); // get the correct file name if such a name already exists
 
   // copy sample document of a necessary extension to the storage path
-  this.copyFile(path.join(__dirname, '..', 'public', 'assets', 'document-templates', isSample
-    ? 'sample' : 'new', demoName), this.storagePath(fileName));
+  let templatePath;
+  if (isSample) {
+    templatePath = path.join(__dirname, '..', 'public', 'assets', 'document-templates', 'sample', demoName);
+  } else {
+    // templates are organised by locale subdirectory (e.g. new/en-US/new.docx); fall back to new/default/
+    const lang = this.getLang();
+    const langPath = path.join(__dirname, '..', 'public', 'assets', 'document-templates', 'new', lang, demoName);
+    const defaultPath = path.join(__dirname, '..', 'public', 'assets', 'document-templates', 'new', 'default', demoName);
+    templatePath = this.existsSync(langPath) ? langPath : defaultPath;
+  }
+  this.copyFile(templatePath, this.storagePath(fileName));
 
   this.saveFileData(fileName, userid, username); // save file data to the file
 
