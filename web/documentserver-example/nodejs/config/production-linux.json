@@ -2,7 +2,7 @@
   "server": {
     "siteUrl": "/",
     "maxFileSize": 104857600,
-    "storageFolder": "/var/lib/onlyoffice/documentserver-example/files",
+    "storageFolder": "/var/lib/euro-office/documentserver-example/files",
     "enableForgotten": false
   }
 }
