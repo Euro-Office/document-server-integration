@@ -34,7 +34,7 @@
     />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
-    <title>{{ .config.Document.Title }} - ONLYOFFICE</title>
+    <title>{{ .config.Document.Title }} - Euro-Office</title>
     <link
       rel="icon"
       href="static/images/{{.docType}}.ico"
@@ -84,7 +84,7 @@
 
         var onMetaChange = function (event) {  // the meta information of the document is changed via the meta command
           if (event.data.title !== undefined) {
-              document.title = event.data.title + " - ONLYOFFICE";
+              document.title = event.data.title + " - Euro-Office";
           }
 
             if (event.data.favorite) {

@@ -24,7 +24,7 @@
     <meta name="viewport" content="width=device-width" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="server-version" content="{{ env('DOCUMENT_SERVER_VERSION') }}">
-    <title>ONLYOFFICE Document Editors</title>
+    <title>Euro-Office Document editors</title>
 
     <link rel="icon" href="/images/favicon.ico" type="image/x-icon" />
 

@@ -22,7 +22,7 @@
         * limitations under the License.
         *
         -->
-        <title>[[${model.getDocument().getTitle()}]] - ONLYOFFICE</title>
+        <title>[[${model.getDocument().getTitle()}]] - Euro-Office</title>
         <link rel="icon" th:href="@{/css/img/{icon}.ico(icon=${model.getDocumentType().toString().toLowerCase()})}" type="image/x-icon"/>
         <link rel="stylesheet" type="text/css" href="css/editor.css" />
 
@@ -101,7 +101,7 @@
                 // the meta information of the document is changed via the meta command
                 var onMetaChange = function (event) {
                     if (event.data.title !== undefined) {
-                        document.title = event.data.title + " - ONLYOFFICE";
+                        document.title = event.data.title + " - Euro-Office";
                     }
 
                     if (event.data.favorite !== undefined) {

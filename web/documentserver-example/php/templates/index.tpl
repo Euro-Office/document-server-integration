@@ -4,7 +4,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="server-version" content="{serverVersion}">
-    <title>ONLYOFFICE Document Editors</title>
+    <title>Euro-Office Document editors</title>
 
     <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon" />
 
@@ -127,8 +127,8 @@
                             {forgottenLink}
                         </menu>
                         <div id="portal-info" style="display: {portalInfoDisplay}">
-                            <span class="portal-name">Welcome to ONLYOFFICE Docs!</span>
-                            <span class="portal-descr">Get started with a live demo of ONLYOFFICE Docs, a powerful open-source office suite for your browser.</span>
+                            <span class="portal-name">Welcome to Euro-Office Docs!</span>
+                            <span class="portal-descr">Get started with a live demo of Euro-Office Docs, a powerful open-source office suite for your browser.</span>
                             <span class="portal-descr">
                                 You can test editing features in real-time and explore multi-user collaboration:
                                 <ul>

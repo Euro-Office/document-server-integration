@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
     <link rel="icon" href="assets/images/{docType}.ico" type="image/x-icon" />
-    <title>{fileName} - ONLYOFFICE</title>
+    <title>{fileName} - Euro-Office</title>
 
     <style>
         html {
@@ -218,7 +218,7 @@
         // the meta information of the document is changed via the meta command
         var onMetaChange = function (event) {
             if (event.data.title !== undefined) {
-                document.title = event.data.title + " - ONLYOFFICE";
+                document.title = event.data.title + " - Euro-Office";
             }
 
             if (event.data.favorite !== undefined) {

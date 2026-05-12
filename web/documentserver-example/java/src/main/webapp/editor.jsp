@@ -27,7 +27,7 @@
         * limitations under the License.
         *
         -->
-        <title><%= Model.getDocument().getTitle() %> - ONLYOFFICE</title>
+        <title><%= Model.getDocument().getTitle() %> - Euro-Office</title>
         <link rel="icon" href="css/img/<%= Model.getDocumentType() %>.ico" type="image/x-icon" />
         <link rel="stylesheet" type="text/css" href="css/editor.css" />
 
@@ -108,7 +108,7 @@
         // the meta information of the document is changed via the meta command
         var onMetaChange = function (event) {
             if (event.data.title !== undefined) {
-                document.title = event.data.title + " - ONLYOFFICE";
+                document.title = event.data.title + " - Euro-Office";
             }
 
             if (event.data.favorite !== undefined) {

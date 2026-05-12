@@ -23,7 +23,7 @@
     * limitations under the License.
     *
     -->
-    <title><%- file.name %> - ONLYOFFICE</title>
+    <title><%- file.name %> - Euro-Office</title>
     <link rel="icon"
         href="images/<%- editor.documentType %>.ico"
         type="image/x-icon" />
@@ -95,7 +95,7 @@
 
         var onMetaChange = function (event) {  // the meta information of the document is changed via the meta command
             if (event.data.title !== undefined) {
-                document.title = event.data.title + " - ONLYOFFICE";
+                document.title = event.data.title + " - Euro-Office";
             }
 
             if (event.data.favorite !== undefined) {
