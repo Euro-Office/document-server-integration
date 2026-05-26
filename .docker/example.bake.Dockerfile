@@ -16,14 +16,19 @@ FROM ubuntu:24.04 AS web-base
 
 #### DOCUMENTSERVER-EXAMPLE ####
 FROM web-base AS build-example
-ARG TARGETARCH
+    ARG TARGETARCH
+    ARG BRANDING_DIR
 
-COPY document-server-integration/web/documentserver-example/nodejs/package*.json /app/
-RUN --mount=type=cache,target=/root/.npm cd /app && npm install
-COPY document-server-integration/web/documentserver-example/nodejs /app
-WORKDIR /app
-RUN TARGETARCH_PKG=$(echo "$TARGETARCH" | sed 's/amd64/x64/') && \
-pkg . -t linux-"$TARGETARCH_PKG" --node-options="--max_old_space_size=4096" -o /app/example
+    COPY document-server-integration/web/documentserver-example/nodejs/package*.json /app/
+    RUN --mount=type=cache,target=/root/.npm cd /app && npm install
+    COPY document-server-integration/web/documentserver-example/nodejs /app
+
+    ### Branding
+    COPY ${BRANDING_DIR}/document-server-integration/web/documentserver-example/nodejs /app
+
+    WORKDIR /app
+    RUN TARGETARCH_PKG=$(echo "$TARGETARCH" | sed 's/amd64/x64/') && \
+    pkg . -t linux-"$TARGETARCH_PKG" --node-options="--max_old_space_size=4096" -o /app/example
 
 FROM scratch AS example
     COPY --from=build-example /app/ /example

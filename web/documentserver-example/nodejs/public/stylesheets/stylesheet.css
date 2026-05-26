@@ -110,7 +110,7 @@ header img {
 }
 
 .portal-name {
-    color: #FF6F3D;
+    color: #0082C9;
     font-size: 24px;
     font-weight: bold;
     line-height: 133%;
@@ -208,8 +208,8 @@ label .checkbox {
 }
 
 .button.orange {
-    background: #FF6F3D;
-    border: 1px solid #FF6F3D;
+    background: #0082C9;
+    border: 1px solid #0082C9;
     color: #FFFFFF;
 }
 
@@ -220,7 +220,7 @@ label .checkbox {
 }
 
 .button.orange:not(.disable):hover{
-    background: #ff7a4b;
+    background: #00a5fd;
 }
 
 .button.gray {
@@ -235,8 +235,8 @@ label .checkbox {
 }
 
 .button.gray:not(.disable):hover {
-    border: 1px solid #FF6F3D;
-    color: #FF6F3D;
+    border: 1px solid #0082C9;
+    color: #0082C9;
 }
 
 .button.converting {
@@ -265,14 +265,14 @@ label .checkbox {
 }
 
 .button.hoar:not(.disable):hover {
-    background: #FF6F3D;
-    border: 1px solid #FF6F3D;
+    background: #0082C9;
+    border: 1px solid #0082C9;
     color: #FFFFFF;
 }
 
 .button.hoar.orange {
-    background: #FF6F3D;
-    border: 1px solid #FF6F3D;
+    background: #0082C9;
+    border: 1px solid #0082C9;
     color: #FFFFFF;
     cursor: default;
 }
@@ -365,11 +365,11 @@ label .checkbox {
 }
 
 .links li.active {
-    border-bottom: 2px solid #FF6F3D;
+    border-bottom: 2px solid #0082C9;
 }
 
 .links li.active a {
-    color: #FF6F3D;
+    color: #0082C9;
 }
 
 .links li.active a img {
@@ -501,7 +501,7 @@ label .checkbox {
 }
 
 .convertPercent {
-    color: #FF6F3D;
+    color: #0082C9;
     font-weight: 700;
     display: inline;
 }
@@ -572,7 +572,7 @@ footer table td {
 footer a,
 footer a:hover,
 footer a:visited {
-    color: #FF6F3D;
+    color: #0082C9;
     font-size: 14px;
     line-height: 120%;
 }
