@@ -27,6 +27,8 @@ const users = require('../users');
 const configServer = config.get('server');
 const siteUrl = configServer.get('siteUrl'); // the path to the editors installation
 
+const appName = configServer.get('appName');
+
 const getCustomWopiParams = function getCustomWopiParams(query) {
   let tokenParams = '';
   let actionParams = '';
@@ -87,6 +89,7 @@ exports.registerRoutes = function registerRoutes(app) {
 
       // render wopiIndex template with the parameters specified
       res.render('wopiIndex', {
+        appName,
         wopiEnable,
         storedFiles: wopiEnable ? files : [],
         params: req.DocManager.getCustomParams(),
@@ -137,6 +140,7 @@ exports.registerRoutes = function registerRoutes(app) {
 
       // render wopiAction template with the parameters specified
       res.render('wopiAction', {
+        appName,
         actionUrl: utils.getActionUrl(
           req.DocManager.getServerUrl(true),
           req.DocManager.curUserHostAddress(),

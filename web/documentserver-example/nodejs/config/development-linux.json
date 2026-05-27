@@ -1,5 +1,6 @@
 {
   "server": {
+    "appName": "Euro-Office",
     "siteUrl": "/",
     "exampleUrl": "http://localhost/example",
     "token": {

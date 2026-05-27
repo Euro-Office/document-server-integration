@@ -50,6 +50,8 @@ const cfgSignatureSecret = configServer.get('token.secret');
 const verifyPeerOff = configServer.get('verify_peer_off');
 const plugins = config.get('plugins');
 
+const appName = configServer.get('appName');
+
 if (verifyPeerOff) {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 }
@@ -95,6 +97,7 @@ app.get('/', (req, res) => { // define a handler for default page
     req.DocManager = new DocManager(req, res);
 
     res.render('index', { // render index template with the parameters specified
+      appName,
       preloaderUrl: siteUrl + configServer.get('preloaderUrl'),
       fillExts: fileUtility.getFillExtensions(),
       storedFiles: req.DocManager.getStoredFiles(),
@@ -162,7 +165,7 @@ app.get('/forgotten', async (req, res) => {
   }
 
   req.DocManager = new DocManager(req, res);
-  res.render('forgotten', { forgottenFiles });
+  res.render('forgotten', { forgottenFiles, appName, });
 });
 
 app.delete('/forgotten', (req, res) => { // define a handler for removing forgotten file
@@ -1252,6 +1255,7 @@ app.get('/editor', (req, res) => { // define a handler for editing document
 
     // file config data
     const argss = {
+      appName,
       apiUrl: siteUrl + configServer.get('apiUrl'),
       file: {
         name: fileName,

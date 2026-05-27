@@ -18,17 +18,22 @@ FROM ubuntu:24.04 AS web-base
 FROM web-base AS build-example
     ARG TARGETARCH
     ARG BRANDING_DIR
+    ARG COMPANY_NAME
 
     COPY document-server-integration/web/documentserver-example/nodejs/package*.json /app/
     RUN --mount=type=cache,target=/root/.npm cd /app && npm install
     COPY document-server-integration/web/documentserver-example/nodejs /app
 
     ### Branding
+    ENV COMPANY_NAME=${COMPANY_NAME}
     COPY ${BRANDING_DIR}/document-server-integration/web/documentserver-example/nodejs /app
+    RUN find /app/config/ -type f -name '*.json' \
+        -exec sed -i "s/Euro-Office/${COMPANY_NAME}/g" {} +
+
 
     WORKDIR /app
     RUN TARGETARCH_PKG=$(echo "$TARGETARCH" | sed 's/amd64/x64/') && \
-    pkg . -t linux-"$TARGETARCH_PKG" --node-options="--max_old_space_size=4096" -o /app/example
+        pkg . -t linux-"$TARGETARCH_PKG" --node-options="--max_old_space_size=4096" -o /app/example
 
 FROM scratch AS example
     COPY --from=build-example /app/ /example

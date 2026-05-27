@@ -1,5 +1,6 @@
 {
   "server": {
+    "appName": "Euro-Office",
     "siteUrl": "/",
     "maxFileSize": 104857600,
     "enableForgotten": false

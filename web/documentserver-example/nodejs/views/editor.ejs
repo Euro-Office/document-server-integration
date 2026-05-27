@@ -23,7 +23,7 @@
     * limitations under the License.
     *
     -->
-    <title><%- file.name %> - Euro-Office</title>
+    <title><%- file.name %> - <%= appName %></title>
     <link rel="icon"
         href="images/<%- editor.documentType %>.ico"
         type="image/x-icon" />
@@ -95,7 +95,7 @@
 
         var onMetaChange = function (event) {  // the meta information of the document is changed via the meta command
             if (event.data.title !== undefined) {
-                document.title = event.data.title + " - Euro-Office";
+                document.title = event.data.title + " - <%= appName %>";
             }
 
             if (event.data.favorite !== undefined) {
