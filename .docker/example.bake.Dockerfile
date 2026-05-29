@@ -26,7 +26,7 @@ FROM web-base AS build-example
 
     ### Branding
     ENV COMPANY_NAME=${COMPANY_NAME}
-    COPY --from=brand-icons /document-server-integration/web/documentserver-example/nodejs[/] /app
+    COPY --from=brand-icons /[d]ocument-server-integration/web/documentserver-example/nodejs /app/
     RUN find /app/config/ -type f -name '*.json' \
         -exec sed -i "s/Euro-Office/${COMPANY_NAME}/g" {} +
 
