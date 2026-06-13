@@ -33,6 +33,19 @@ jobs:
         with:
           path: dsi
 
+      # The nodejs example embeds public/** into the pkg binary and requires
+      # document-formats/onlyoffice-docs-formats.json at startup; it also serves
+      # "new" files from document-templates. Both are submodules — init just the
+      # nodejs example's assets (not all languages') so the binary isn't missing
+      # them at runtime.
+      - name: Init nodejs example asset submodules
+        working-directory: dsi
+        run: |
+          git submodule update --init --depth 1 \
+            web/documentserver-example/nodejs/public/assets/document-formats \
+            web/documentserver-example/nodejs/public/assets/document-templates \
+            web/documentserver-example/nodejs/public/assets/plugin-aiautofill
+
       # The e2e suite lives in the DocumentServer repo. Prefer a same-named
       # branch (so tests can be co-developed with the change), else main.
       - name: Check out DocumentServer e2e (current branch)
