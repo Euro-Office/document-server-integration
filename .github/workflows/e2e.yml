@@ -103,6 +103,26 @@ jobs:
           E2E_IMAGE: ${{ env.OVERLAY_IMAGE }}
         run: npm test
 
+      # On failure, boot the overlay image standalone and dump the example
+      # process logs so the real startup error is visible in CI (the e2e
+      # harness removes its own container on teardown).
+      - name: Diagnose example startup (on failure)
+        if: failure()
+        run: |
+          set -uo pipefail
+          docker rm -f dsi-diag >/dev/null 2>&1 || true
+          docker run -d --name dsi-diag -p 8997:80 -e EXAMPLE_ENABLED=true ${{ env.OVERLAY_IMAGE }}
+          for i in $(seq 1 30); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8997/example/ || true)
+            echo "t=$((i*3))s /example/ -> $code"; [ "$code" = "200" ] && break; sleep 3
+          done
+          echo "=== supervisor status ==="; docker exec dsi-diag supervisorctl status || true
+          echo "=== ds-example_err.log ==="
+          docker exec dsi-diag sh -c 'cat /var/log/*/*/ds-example_err.log 2>/dev/null | tail -60' || true
+          echo "=== ds-example_out.log ==="
+          docker exec dsi-diag sh -c 'cat /var/log/*/*/ds-example_out.log 2>/dev/null | tail -30' || true
+          docker rm -f dsi-diag >/dev/null 2>&1 || true
+
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4
