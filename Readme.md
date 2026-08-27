@@ -20,7 +20,7 @@ You should change `http://documentserver` to your server address in these files:
 * [Ruby](https://github.com/Euro-Office/document-server-integration/tree/main/web/documentserver-example/ruby) - `web/documentserver-example/ruby/app/configuration/configuration.rb`
 
 
-## Quick Start — minimal Docker test environment
+## Quick Start — minimal Docker run
 
 The repository ships a `docker-compose.yml` that starts a self-contained
 Euro-Office DocumentServer with the Node.js integration example enabled
@@ -28,13 +28,49 @@ automatically. No extra configuration or manual service start is required.
 
 **Prerequisites:** Docker with the Compose plugin (v2).
 
-**1. Start the container:**
+**1. First run**
 
+On the first run, execute:
+
+```bash
+chmod +x install.sh
+```
+```bash
+./install.sh
+```
+```bash
+chmod 400 install.sh
+```
+
+
+The installation script generates a secure JWT secret, stores it in the
+`.env` file, pulls the Docker image, and starts the container.
+It also creates an `.installed` flag to prevent accidental re-runs.
+
+To run it again (e.g. to regenerate the secret), remove the flag first:
+
+​```bash
+rm .installed
+```
+```bash
+chmod 700 install.sh
+```
+```bash
+./install.sh
+```
+```bash
+chmod 400 install.sh
+```
+​
+
+**2. Start the container after the first run:**
+
+For subsequent starts, run:
 ```bash
 docker compose up -d
 ```
 
-**2. Wait until the server is ready** — monitor the logs:
+**3. Wait until the server is ready** — monitor the logs:
 
 ```bash
 docker logs -f eo-documentserver
@@ -46,7 +82,7 @@ The server is ready when you see:
 INFO success: docservice entered RUNNING state
 ```
 
-**3. Open the example in your browser:**
+**4. Open the example in your browser:**
 
 ```
 http://localhost:8080/example/
