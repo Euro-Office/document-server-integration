@@ -329,7 +329,7 @@ if (typeof jQuery != "undefined") {
     jq(document).on("click", "#downloadConverted:not(.disable)", function () {
         var fileId = jq('#hiddenFileName').attr("data");
         if (jq("#downloadConverted").attr("data") == "fromConverter") window.location.assign(fileId);
-        else window.location.href = "download?fileName=" + encodeURIComponent(fileId);
+        else window.location.href = jq("#downloadConverted").attr("data-url") || "download?fileName=" + encodeURIComponent(fileId);
     });
 
     jq(document).on("click", ".reload-page", function () {
@@ -441,6 +441,7 @@ if (typeof jQuery != "undefined") {
                         jq("#convertStep2").text(`2. File conversion to ${fileExt}`);
                         jq("#downloadConverted").removeClass("disable");
                         jq("#hiddenFileName").attr("data",response.filename);
+                        jq("#downloadConverted").attr("data-url",response.downloadUrl || "");
                         if (response.error !== "FileTypeIsNotSupported") {
                             if (formatManager.isEditable(fileExt)) {
                                 jq("#beginEditConverted").removeClass("disable");

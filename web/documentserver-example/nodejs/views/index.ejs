@@ -276,7 +276,7 @@
                                                         <td class="contentCells contentCells-icon downloadContentCellShift"></td>
                                                     <% } %>
                                                     <td class="contentCells contentCells-icon downloadContentCellShift">
-                                                        <a href="download?fileName=<%= encodeURIComponent(storedFiles[i].name) %>">
+                                                        <a href="<%= storedFiles[i].downloadUrl %>">
                                                             <img class="icon-download" src="images/download.svg" alt="Download" title="Download" /></a>
                                                     </td>
                                                     <td class="contentCells contentCells-icon contentCells-shift">

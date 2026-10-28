@@ -18,9 +18,20 @@
 
 const path = require('path');
 const fileSystem = require('fs');
+const jwt = require('jsonwebtoken');
 const configServer = require('config').get('server');
 const fileUtility = require('./fileUtility');
 const documentService = require('./documentService');
+
+const cfgSignatureEnable = configServer.get('token.enable');
+const cfgSignatureUseForRequest = configServer.get('token.useforrequest');
+const cfgSignatureSecret = configServer.get('token.secret');
+// A link handed to the browser is rendered into a page and clicked whenever the
+// reader gets to it, so it cannot live by the short expiry the document server
+// tokens are signed with. It has one of its own, and a missing setting falls
+// back rather than signing a token that never expires.
+const cfgDownloadUrlExpiresIn = (configServer.has('token.downloadUrlExpiresIn')
+  && configServer.get('token.downloadUrlExpiresIn')) || '1h';
 
 const storageConfigFolder = configServer.get('storageFolder');
 
@@ -241,6 +252,15 @@ DocManager.prototype.getDownloadUrl = function getDownloadUrl(fileName, forDocum
   if (forDocumentServer) {
     const hostAddress = this.curUserHostAddress();
     handler += `&useraddress=${encodeURIComponent(hostAddress)}`;
+  } else if (cfgSignatureEnable && cfgSignatureUseForRequest) {
+    // A request coming from the document server is signed by it. A link opened by
+    // the browser can carry no Authorization header, so it gets a token of its own
+    // in the query instead; /download requires one whenever requests are signed.
+    handler += `&token=${encodeURIComponent(jwt.sign(
+      { fileName },
+      cfgSignatureSecret,
+      { expiresIn: cfgDownloadUrlExpiresIn },
+    ))}`;
   }
 
   return server + handler;
@@ -347,6 +367,7 @@ DocManager.prototype.getStoredFiles = function getStoredFiles() {
         documentType: fileUtility.getFileType(storedFiles[i]),
         canEdit: fileUtility.getEditExtensions().indexOf(fileUtility.getFileExtension(storedFiles[i], true)) !== -1,
         version: version + 1,
+        downloadUrl: this.getDownloadUrl(storedFiles[i]), // signed when requests are signed
       };
 
       if (!result.length) { // if the result array is empty

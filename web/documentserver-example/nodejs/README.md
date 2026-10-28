@@ -26,6 +26,16 @@ To connect the editors to your website, specify the path to the editors installa
 
 where the **documentserver** is the name of the server with the ONLYOFFICE Document Server installed, the **storageFolder** and **storagePath** are the paths where files will be created and stored. You can set an absolute path. For example, *D:\\\\folder*. Please note that on Windows OS the double backslash must be used as a separator.
 
+When you pick **Create and open document from URL**, and when you restore a document from a URL, the example downloads that file itself. It only fetches from the hosts listed in `allowedFileHosts`, and from the host of `siteUrl` when `siteUrl` is a full URL:
+
+```
+"allowedFileHosts": ["https://documentserver/"]
+```
+
+List every host you want to open a file from. The host a request names for itself never counts as allowed, since that would let any caller have the example fetch from wherever it likes. If `siteUrl` is a relative path and the list is empty there is no host the example will fetch from, so both of those actions fail until you add one.
+
+When `token.enable` and `token.useforrequest` are both on, the download link shown in the browser carries a token of its own, and that token is valid only for the file it was built for. Its lifetime is `token.downloadUrlExpiresIn`, one hour by default, which is longer than `token.expiresIn` because a link is clicked some time after the page was drawn. A token in the `Authorization` header must likewise name the file: the document server's own download token does, through the URL it signs, while any other token signed with the same secret is refused.
+
 If you want to experiment with the editor configuration, modify the [parameters](https://api.onlyoffice.com/docs/docs-api/usage-api/advanced-parameters/) in the *\views\editor.ejs* file.
 
 ### Step 3. Install Node.js environment
