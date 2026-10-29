@@ -9,9 +9,9 @@ FROM ubuntu:24.04 AS web-base
     RUN apt-get update && \
         apt-get install -y ca-certificates curl gnupg openjdk-21-jdk wget zip brotli bzip2 \
             patch build-essential python3 && \
-        curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+        curl -fsSL https://deb.nodesource.com/setup_24.x | bash - && \
         apt-get install -y nodejs && \
-        npm install -g @yao-pkg/pkg grunt-cli && \
+        npm install -g @yao-pkg/pkg@6.24.0 grunt-cli && \
         rm -rf /var/lib/apt/lists/*
 
 #### DOCUMENTSERVER-EXAMPLE ####
@@ -33,7 +33,7 @@ FROM web-base AS build-example
 
     WORKDIR /app
     RUN TARGETARCH_PKG=$(echo "$TARGETARCH" | sed 's/amd64/x64/') && \
-        pkg . -t linux-"$TARGETARCH_PKG" --node-options="--max_old_space_size=4096" -o /app/example
+        pkg . -t node24-linux-"$TARGETARCH_PKG" --options max_old_space_size=4096 -o /app/example
 
 FROM scratch AS example
     COPY --from=build-example /app/ /example

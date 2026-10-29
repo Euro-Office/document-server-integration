@@ -64,19 +64,19 @@ jobs:
           path: documentserver
           ref: main
 
-      - name: Use Node.js 20
+      - name: Use Node.js 24
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
 
       # Mirrors example.bake.Dockerfile: install deps, then pkg the app.
       - name: Build example app
         working-directory: dsi/web/documentserver-example/nodejs
         run: |
-          npm install -g @yao-pkg/pkg
+          npm install -g @yao-pkg/pkg@6.24.0
           npm install
           mkdir -p "${{ github.workspace }}/deploy"
-          pkg . -t linux-x64 --node-options="--max_old_space_size=4096" -o "${{ github.workspace }}/deploy/example"
+          pkg . -t node24-linux-x64 --options max_old_space_size=4096 -o "${{ github.workspace }}/deploy/example"
 
       - name: Pull nightly image
         run: docker pull ${{ env.NIGHTLY_IMAGE }}
