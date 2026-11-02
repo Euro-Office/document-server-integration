@@ -145,8 +145,9 @@ DocManager.prototype.createDemo = function createDemo(isSample, fileExt, userid,
   } else {
     // templates are organised by locale subdirectory (e.g. new/en-US/new.docx); fall back to new/default/
     const lang = this.getLang();
-    const langPath = path.join(__dirname, '..', 'public', 'assets', 'document-templates', 'new', lang, demoName);
-    const defaultPath = path.join(__dirname, '..', 'public', 'assets', 'document-templates', 'new', 'default', demoName);
+    const templatesDir = path.join(__dirname, '..', 'public', 'assets', 'document-templates', 'new');
+    const langPath = path.join(templatesDir, lang, demoName);
+    const defaultPath = path.join(templatesDir, 'default', demoName);
     templatePath = this.existsSync(langPath) ? langPath : defaultPath;
   }
   this.copyFile(templatePath, this.storagePath(fileName));

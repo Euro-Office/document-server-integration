@@ -165,7 +165,7 @@ app.get('/forgotten', async (req, res) => {
   }
 
   req.DocManager = new DocManager(req, res);
-  res.render('forgotten', { forgottenFiles, appName, });
+  res.render('forgotten', { forgottenFiles, appName });
 });
 
 app.delete('/forgotten', (req, res) => { // define a handler for removing forgotten file
