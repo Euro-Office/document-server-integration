@@ -14,6 +14,7 @@
   "server": {
     "port": 3000,
     "siteUrl": "http://documentserver/",
+    "allowedFileHosts": [],
     "wopi": {
       "discovery": "hosting/discovery"
     },
@@ -35,7 +36,8 @@
         "authorizationHeader": "Authorization",
         "authorizationHeaderPrefix": "Bearer ",
         "secret": "euro-office-dev-jwt-secret-key-2026",
-        "expiresIn": "5m"
+        "expiresIn": "5m",
+        "downloadUrlExpiresIn": "1h"
     },
     "verify_peer_off": true,
     "languages": {

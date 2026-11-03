@@ -195,17 +195,47 @@ app.get('/download', (req, res) => { // define a handler for downloading files
   const userAddress = req.query.useraddress;
   let token = '';
 
-  if (!!userAddress
-        && cfgSignatureEnable && cfgSignatureUseForRequest) {
+  // Whether a token is needed depends on the configuration alone. It used to
+  // also require useraddress to be present, which left the file readable to
+  // anybody who simply did not send that parameter.
+  if (cfgSignatureEnable && cfgSignatureUseForRequest) {
     const authorization = req.get(cfgSignatureAuthorizationHeader);
+    let fromQuery = false;
     if (authorization && authorization.startsWith(cfgSignatureAuthorizationHeaderPrefix)) {
       token = authorization.substring(cfgSignatureAuthorizationHeaderPrefix.length);
+    } else if (req.query.token) {
+      // A download opened by the browser carries no Authorization header, so the
+      // link built for it puts the token in the query.
+      token = req.query.token;
+      fromQuery = true;
     }
 
     try {
-      jwt.verify(token, cfgSignatureSecret);
+      const payload = jwt.verify(token, cfgSignatureSecret);
+      // A signature says who signed the token, not which file it was meant for,
+      // and every token this example signs or receives uses the same secret. So
+      // the token has to name the file it is used for, otherwise one token opens
+      // every document in the storage folder. A link token names it in fileName;
+      // the document server signs {payload: {url}} with the url it fetches. Any
+      // other shape, such as the editor config token every browser sees, names
+      // no file and is refused.
+      let tokenFileName = '';
+      if (fromQuery) {
+        if (payload && typeof payload.fileName === 'string') tokenFileName = payload.fileName;
+      } else if (payload && payload.payload && typeof payload.payload.url === 'string') {
+        const { query } = urlModule.parse(payload.payload.url, true);
+        if (typeof query.fileName === 'string') tokenFileName = query.fileName;
+      }
+      tokenFileName = fileUtility.getFileName(tokenFileName);
+      if (tokenFileName !== fileName) {
+        console.log(`download refused: token was issued for ${tokenFileName}`);
+        res.sendStatus(403);
+        return;
+      }
     } catch (err) {
-      console.log(`checkJwtHeader error: name = ${err.name} message = ${err.message} token = ${token}`);
+      // The token is a credential and now arrives from the query as well, so the
+      // failure log names the error without echoing what was refused.
+      console.log(`checkJwtHeader error: name = ${err.name} message = ${err.message}`);
       res.sendStatus(403);
       return;
     }
@@ -357,6 +387,80 @@ app.post('/upload', (req, res) => { // define a handler for uploading files
   });
 });
 
+// The example fetches the address a request names, so the hosts it may fetch
+// have to be known before the request is read. They come from the configuration:
+// siteUrl when it is an absolute URL, plus server.allowedFileHosts. The host of
+// the request itself is never the yardstick, because the request is what carries
+// it - "Host: evil" would have made evil the allowed host.
+function getFileHostAllowList() {
+  const hosts = [];
+  const addHost = (value) => {
+    if (!value) return;
+
+    // Either form is accepted: a URL, from which the host is taken with the same
+    // parser getAllowedFetchUrl uses, or the host on its own, which that parser
+    // either refuses ("127.0.0.1:8099") or reads as a scheme ("localhost:8099").
+    let entry = String(value).trim();
+    let parsed = null;
+    try {
+      parsed = new URL(entry);
+    } catch (e) {
+      parsed = null;
+    }
+
+    if (parsed && parsed.host && (parsed.protocol === 'http:' || parsed.protocol === 'https:')) {
+      entry = parsed.host;
+    } else {
+      // A bare host, optionally with a port. Canonicalize it through the same
+      // parser the fetch side uses, so a default port written here
+      // ("documentserver:80") still matches target.host, which drops it.
+      const bare = entry.replace(/^\/+/, '').replace(/\/+$/, '');
+      try {
+        entry = new URL(`http://${bare}`).host || bare;
+      } catch (e) {
+        entry = bare;
+      }
+    }
+
+    if (entry) hosts.push(entry.toLowerCase());
+  };
+
+  addHost(siteUrl);
+  if (configServer.has('allowedFileHosts')) {
+    configServer.get('allowedFileHosts').forEach(addHost);
+  }
+
+  return hosts;
+}
+
+const fileHostAllowList = getFileHostAllowList();
+
+if (fileHostAllowList.length === 0) {
+  console.log('no host to fetch a file from is configured: set server.allowedFileHosts');
+}
+
+// /create and /restore fetch an address that the request names, and /restore
+// writes what it gets. Such a URL is fetched only when it names a configured
+// host over http or https. The check and the fetch have to see the same URL:
+// urllib puts "http://" in front of text that does not start with a scheme, so
+// "\nhttp://allowed/" passed a check made on the raw text and was then fetched
+// from the host "http". The URL is parsed once here, and the normalised href
+// that was checked is what gets fetched. Returns null when it is not allowed.
+function getAllowedFetchUrl(rawUrl) {
+  if (typeof rawUrl !== 'string') return null;
+  let target;
+  try {
+    target = new URL(rawUrl);
+  } catch (e) {
+    return null;
+  }
+
+  if (target.protocol !== 'http:' && target.protocol !== 'https:') return null;
+  if (!target.host || fileHostAllowList.indexOf(target.host.toLowerCase()) === -1) return null;
+
+  return target.href;
+}
+
 app.post('/create', (req, res) => {
   const { title } = req.body;
   const fileUrl = req.body.url;
@@ -364,11 +468,8 @@ app.post('/create', (req, res) => {
   try {
     req.DocManager = new DocManager(req, res);
 
-    let host = siteUrl;
-    if (host.indexOf('/') === 0) {
-      host = req.DocManager.getServerHost();
-    }
-    if (urlModule.parse(fileUrl).host !== urlModule.parse(host).host) {
+    const fetchUrl = getAllowedFetchUrl(fileUrl);
+    if (!fetchUrl) {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.write(JSON.stringify({ error: 'File domain is incorrect' }));
       res.end();
@@ -381,7 +482,17 @@ app.post('/create', (req, res) => {
     const userAddress = req.DocManager.curUserHostAddress();
     req.DocManager.historyPath(fileName, userAddress, true);
 
-    urllib.request(fileUrl, { method: 'GET' }, (err, data) => {
+    urllib.request(fetchUrl, { method: 'GET', followRedirect: false, timeout: 30000 }, (err, data, response) => {
+      // A fetch that never completed has no body, and data.length on undefined
+      // threw here and took the process with it. Redirects are not followed, so
+      // an allowed host cannot be used as a door to another one.
+      if (err || !response || response.statusCode !== 200 || !data) {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.write(JSON.stringify({ error: 'File download failed' }));
+        res.end();
+        return;
+      }
+
       // check if the file size exceeds the maximum file size
       if (configServer.get('maxFileSize') < data.length || data.length <= 0) {
         res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -436,6 +547,10 @@ app.post('/convert', (req, res) => { // define a handler for converting files
 
     // write file name, step and error values to the result object if they are defined
     if (filename !== null) result.filename = filename;
+
+    // the dialog downloads the stored file through a plain link, which needs a
+    // signed url of its own when requests are signed
+    if (filename !== null && error === null) result.downloadUrl = req.DocManager.getDownloadUrl(filename);
 
     if (step !== null) result.step = step;
 
@@ -680,25 +795,50 @@ app.put('/restore', async (req, res) => { // define a handler for restore file v
   if (fileName) {
     req.DocManager = new DocManager(req, res);
     const userAddress = req.DocManager.curUserHostAddress();
+    // getKey stats the stored file; a request naming one that is not there would
+    // otherwise throw out of this async handler and take the process down.
+    if (!req.DocManager.existsSync(req.DocManager.storagePath(fileName, userAddress))) {
+      result.success = false;
+      result.error = 'File not found';
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.write(JSON.stringify(result));
+      res.end();
+      return;
+    }
     const key = req.DocManager.getKey(fileName);
     const filePath = req.DocManager.storagePath(fileName, userAddress);
     const historyPath = req.DocManager.historyPath(fileName, userAddress);
     const newVersion = req.DocManager.countVersion(historyPath) + 1;
     const newVersionPath = path.join(`${historyPath}`, `${newVersion}`);
     if (url) {
-      const { status, data } = await urllib.request(url, { method: 'GET' });
-      if (status === 200) {
-        req.DocManager.createDirectory(newVersionPath);
-        req.DocManager.copyFile(
-          filePath,
-          path.join(`${newVersionPath}`, `prev${fileUtility.getFileExtension(fileName)}`),
-        );
-        fileSystem.writeFileSync(path.join(`${newVersionPath}`, 'key.txt'), key);
-        fileSystem.writeFileSync(filePath, data);
-        result.success = true;
-      } else {
+      // The address comes from the request and what it returns is written over the
+      // document, so it is held to the same rule as /create.
+      const fetchUrl = getAllowedFetchUrl(url);
+      if (!fetchUrl) {
         result.success = false;
-        result.error = `Document editing service returned status: ${status}`;
+        result.error = 'Document url is not allowed';
+      } else {
+        // A fetch that fails rejects, and an unhandled rejection ends the process.
+        let fetched = null;
+        try {
+          fetched = await urllib.request(fetchUrl, { method: 'GET', followRedirect: false, timeout: 30000 });
+        } catch (err) {
+          fetched = null;
+        }
+        const { status, data } = fetched || {};
+        if (status === 200 && data) {
+          req.DocManager.createDirectory(newVersionPath);
+          req.DocManager.copyFile(
+            filePath,
+            path.join(`${newVersionPath}`, `prev${fileUtility.getFileExtension(fileName)}`),
+          );
+          fileSystem.writeFileSync(path.join(`${newVersionPath}`, 'key.txt'), key);
+          fileSystem.writeFileSync(filePath, data);
+          result.success = true;
+        } else {
+          result.success = false;
+          result.error = fetched ? `Document editing service returned status: ${status}` : 'Document download failed';
+        }
       }
     } else {
       const versionPath = path.join(`${historyPath}`, `${version}`, `prev${fileUtility.getFileExtension(fileName)}`);
