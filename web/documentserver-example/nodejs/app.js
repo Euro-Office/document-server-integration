@@ -442,13 +442,15 @@ if (fileHostAllowList.length === 0) {
 // The document server builds the links in a callback from the address the browser
 // used, and this backend may not be able to reach that one: with "-p 8080:80" the
 // port only exists on the docker host. When the document server has an internal
-// address, that is the one the links are fetched from.
+// address, that is the one the links are fetched from. A proxy on a subpath puts its
+// prefix in front of /cache/files, which only exists on the public address.
 function toInternalUrl(url) {
   const internalSiteUrl = configServer.get('internalSiteUrl');
   if (!url || !internalSiteUrl) return url;
 
   const { pathname, search } = new URL(url);
-  return new URL(pathname + search, internalSiteUrl).href;
+  const start = Math.max(pathname.indexOf('/cache/files/'), 0);
+  return new URL(pathname.slice(start) + search, internalSiteUrl).href;
 }
 
 // /create and /restore fetch an address that the request names, and /restore
