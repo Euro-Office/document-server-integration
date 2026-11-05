@@ -2,6 +2,7 @@
   "server": {
     "appName": "Euro-Office",
     "siteUrl": "/",
+    "internalSiteUrl": "http://localhost/",
     "maxFileSize": 104857600,
     "storageFolder": "/var/lib/euro-office/documentserver-example/files",
     "enableForgotten": false

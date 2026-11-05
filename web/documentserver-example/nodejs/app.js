@@ -439,6 +439,18 @@ if (fileHostAllowList.length === 0) {
   console.log('no host to fetch a file from is configured: set server.allowedFileHosts');
 }
 
+// The document server builds the links in a callback from the address the browser
+// used, and this backend may not be able to reach that one: with "-p 8080:80" the
+// port only exists on the docker host. When the document server has an internal
+// address, that is the one the links are fetched from.
+function toInternalUrl(url) {
+  const internalSiteUrl = configServer.get('internalSiteUrl');
+  if (!url || !internalSiteUrl) return url;
+
+  const { pathname, search } = new URL(url);
+  return new URL(pathname + search, internalSiteUrl).href;
+}
+
 // /create and /restore fetch an address that the request names, and /restore
 // writes what it gets. Such a URL is fetched only when it names a configured
 // host over http or https. The check and the fetch have to see the same URL:
@@ -910,7 +922,7 @@ app.post('/track', async (req, res) => { // define a handler for tracking file c
         const versionPath = req.DocManager.versionPath(newFileName, userAddress, version);
         req.DocManager.createDirectory(versionPath); // create a directory to the specified file version
 
-        const downloadZip = body.changesurl;
+        const downloadZip = toInternalUrl(body.changesurl);
         if (downloadZip) {
           // get the path to the file with document versions differences
           const pathChanges = req.DocManager.diffPath(newFileName, userAddress, version);
@@ -1053,7 +1065,7 @@ app.post('/track', async (req, res) => { // define a handler for tracking file c
           const uid = body.actions[0].userid;
           req.DocManager.saveFileData(correctName, uid, 'Filling Form', userAddress);
 
-          const { formsdataurl } = body;
+          const formsdataurl = toInternalUrl(body.formsdataurl);
           if (formsdataurl) {
             const formsdataName = req.DocManager.getCorrectName(
               `${fileUtility.getFileName(correctName, true)}.txt`,
@@ -1135,10 +1147,10 @@ app.post('/track', async (req, res) => { // define a handler for tracking file c
         }
       }
     } else if (bodyTrack.status === 2 || bodyTrack.status === 3) { // MustSave, Corrupted
-      await processSave(bodyTrack.url, bodyTrack, fileNameTrack, userAddressTrack); // save file
+      await processSave(toInternalUrl(bodyTrack.url), bodyTrack, fileNameTrack, userAddressTrack); // save file
       return;
     } else if (bodyTrack.status === 6 || bodyTrack.status === 7) { // MustForceSave, CorruptedForceSave
-      await processForceSave(bodyTrack.url, bodyTrack, fileNameTrack, userAddressTrack); // force save file
+      await processForceSave(toInternalUrl(bodyTrack.url), bodyTrack, fileNameTrack, userAddressTrack); // force save
       return;
     }
 

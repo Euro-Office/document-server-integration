@@ -23,6 +23,7 @@ export NODE_CONFIG='{
 	"server": {
 		"siteUrl": "'${DS_URL:-"/"}'",
 		"exampleUrl": "'${EXAMPLE_URL:-http://localhost/example/}'",
+		"internalSiteUrl": "'${DS_INTERNAL_URL:-}'",
 		"token": {
 			"enable": '${JWT_ENABLED:-false}',
 			"secret": "'${JWT_SECRET:-euro-office-dev-jwt-secret-key-2026}'",
